@@ -1,0 +1,195 @@
+"""
+Project structure documentation
+"""
+
+PROJECT_STRUCTURE = """
+School Management System - Flask Backend
+=========================================
+
+Project Directory: c:\\Users\\HP\\Desktop\\mgnt
+
+📁 mgnt/
+├── 📁 app/                          # Main application package
+│   ├── 📁 models/                   # Database models
+│   │   ├── __init__.py              # Models package init
+│   │   ├── user.py                  # User, Role models
+│   │   ├── student.py               # Student, StudentParent models
+│   │   ├── class_model.py           # Class, Subject models
+│   │   ├── attendance.py            # Attendance models
+│   │   ├── marks.py                 # Marks, TermReport models
+│   │   └── communication.py         # Message, Announcement models
+│   │
+│   ├── 📁 routes/                   # API endpoints (blueprints)
+│   │   ├── __init__.py              # Routes package init
+│   │   ├── auth.py                  # Authentication endpoints
+│   │   ├── users.py                 # User management endpoints
+│   │   ├── students.py              # Student management endpoints
+│   │   ├── attendance.py            # Attendance endpoints
+│   │   ├── marks.py                 # Marks endpoints
+│   │   ├── reports.py               # Report generation endpoints
+│   │   ├── classes.py               # Class management endpoints
+│   │   └── communication.py         # Messaging & announcements endpoints
+│   │
+│   ├── 📁 schemas/                  # Data validation (expandable)
+│   │   └── __init__.py
+│   │
+│   ├── 📁 utils/                    # Helper functions & utilities
+│   │   ├── __init__.py              # Utils package init
+│   │   ├── decorators.py            # Auth & validation decorators
+│   │   └── helpers.py               # Helper functions
+│   │
+│   └── __init__.py                  # App factory & initialization
+│
+├── 📁 migrations/                   # Database migrations (Flask-Migrate)
+│   └── (Migration files will be generated)
+│
+├── 📁 tests/                        # Test suite
+│   ├── conftest.py                  # Pytest configuration & fixtures
+│   ├── test_auth.py                 # Authentication tests
+│   └── (Additional test files)
+│
+├── 📄 config.py                     # Configuration settings
+├── 📄 run.py                        # Application entry point
+├── 📄 init_db.py                    # Database initialization
+├── 📄 seed_data.py                  # Sample data seeding
+├── 📄 requirements.txt              # Python dependencies
+├── 📄 .env.example                  # Environment variables template
+├── 📄 .gitignore                    # Git ignore rules
+└── 📄 README.md                     # Project documentation
+
+KEY FILES:
+
+1. run.py
+   - Main entry point to start the Flask server
+   - Usage: python run.py
+
+2. config.py
+   - Configuration for different environments (dev, test, prod)
+   - Database connection strings
+   - JWT settings
+
+3. app/__init__.py
+   - Application factory pattern
+   - Extension initialization (SQLAlchemy, JWT, etc.)
+   - Blueprint registration
+   - Error handlers
+
+4. models/ (Database Schema)
+   - User: Stores user information and authentication
+   - Student: Student profiles and enrollment
+   - Class: Classes/Grades and their information
+   - Subject: Subjects offered in classes
+   - Attendance: Attendance records
+   - Marks: Examination marks and grades
+   - Message: Direct messaging between users
+   - Announcement: System and class announcements
+
+5. routes/ (API Endpoints)
+   - auth.py: User authentication (login, register, etc.)
+   - users.py: User management CRUD operations
+   - students.py: Student management operations
+   - attendance.py: Attendance tracking
+   - marks.py: Marks recording and management
+   - reports.py: Report generation (term reports, analytics)
+   - classes.py: Class and subject management
+   - communication.py: Messaging and announcements
+
+6. utils/
+   - decorators.py: Authentication and validation decorators
+   - helpers.py: Utility functions (password hashing, calculations, etc.)
+
+DATABASE MODELS RELATIONSHIPS:
+
+User
+├── Student (1:1 relationship)
+├── Classes as Teacher (1:N)
+├── Messages Sent (1:N)
+├── Messages Received (1:N)
+└── Announcements Created (1:N)
+
+Student
+├── User (1:1)
+├── Class (N:1)
+├── Attendance Records (1:N)
+├── Marks (1:N)
+└── Parents (1:N)
+
+Class
+├── Teacher (N:1)
+├── Students (1:N)
+└── Subjects (1:N)
+
+Subject
+├── Class (N:1)
+└── Marks (1:N)
+
+API BASE URL: http://localhost:5000/api
+
+GETTING STARTED:
+
+1. Create virtual environment:
+   python -m venv venv
+   source venv/Scripts/activate
+
+2. Install dependencies:
+   pip install -r requirements.txt
+
+3. Create .env file:
+   cp .env.example .env
+
+4. Initialize database:
+   python init_db.py
+
+5. (Optional) Seed sample data:
+   python seed_data.py
+
+6. Run the server:
+   python run.py
+
+The server will start at http://localhost:5000
+
+TESTING:
+
+Run tests with pytest:
+   pytest
+
+Run tests with coverage:
+   pytest --cov=app
+
+FEATURES IMPLEMENTED:
+
+✅ User Authentication (JWT)
+✅ Role-Based Access Control (5 roles)
+✅ Student Management
+✅ Attendance Tracking (with bulk operations)
+✅ Marks Recording (with automatic grading)
+✅ Report Generation (term reports, performance analytics)
+✅ Class Management
+✅ Messaging System
+✅ Announcements System
+✅ Error Handling
+✅ Request Validation
+✅ Pagination Support
+✅ Database Models with Relationships
+
+TECHNOLOGY STACK:
+
+Backend Framework: Flask 2.3.2
+Database: SQLAlchemy ORM
+Authentication: Flask-JWT-Extended
+Validation: Marshmallow
+Password Hashing: bcrypt
+Database: SQLite (dev) / PostgreSQL (prod)
+Migration: Flask-Migrate
+
+NEXT STEPS:
+
+1. Configure .env file with your settings
+2. Set up database
+3. Create users and roles
+4. Start testing API endpoints
+5. Integrate with frontend application
+"""
+
+if __name__ == '__main__':
+    print(PROJECT_STRUCTURE)
