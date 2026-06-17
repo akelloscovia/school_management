@@ -22,12 +22,17 @@ def create_app(config_name=None):
     app.config.from_object(config[config_name])
 
     # ----------------------------
-    # CORS CONFIG (FIXED)
+    # CORS CONFIG
     # ----------------------------
+    cors_origins = os.getenv(
+        'CORS_ORIGINS',
+        'http://localhost:5173,http://localhost:3000,http://localhost:8000,https://school-mgt-frontend-89tm.onrender.com'
+    ).split(',')
+
     CORS(
         app,
         resources={r"/api/*": {
-            "origins": "https://school-mgt-frontend-89tm.onrender.com"
+            "origins": cors_origins
         }},
         supports_credentials=True,
         allow_headers=["Content-Type", "Authorization"],
