@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
@@ -26,18 +26,36 @@ def create_app(config_name=None):
     # ----------------------------
     cors_origins = os.getenv(
         'CORS_ORIGINS',
-        'http://localhost:5173,http://localhost:3000,http://localhost:8000,https://school-mgt-frontend-89tm.onrender.com'
+        'http://localhost:5173,http://localhost:5174,http://localhost:3000,http://localhost:8000,https://school-mgt-frontend-89tm.onrender.com'
     ).split(',')
 
-    CORS(
-        app,
-        resources={r"/api/*": {
-            "origins": cors_origins
-        }},
-        supports_credentials=True,
-        allow_headers=["Content-Type", "Authorization"],
-        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    )
+    # In development allow all origins to avoid CORS issues from different dev ports
+    if config_name == 'development':
+        CORS(
+            app,
+            resources={r"/api/*": {"origins": "*"}},
+            supports_credentials=True,
+            allow_headers=["Content-Type", "Authorization"],
+            methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        )
+        @app.after_request
+        def add_dev_cors_headers(response):
+            origin = request.headers.get('Origin') or '*'
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+            response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
+            return response
+    else:
+        CORS(
+            app,
+            resources={r"/api/*": {
+                "origins": cors_origins
+            }},
+            supports_credentials=True,
+            allow_headers=["Content-Type", "Authorization"],
+            methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        )
 
     # Initialize extensions
     db.init_app(app)
