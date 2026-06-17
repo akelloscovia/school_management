@@ -10,6 +10,42 @@ jwt = JWTManager()
 migrate = Migrate()
 
 
+def ensure_default_roles_and_admin():
+    from app.models import Role, User
+
+    default_roles = [
+        'admin',
+        'teacher',
+        'student',
+        'parent',
+        'accountant'
+    ]
+
+    for role_name in default_roles:
+        if not Role.query.filter_by(name=role_name).first():
+            db.session.add(Role(name=role_name, description=role_name.capitalize()))
+
+    db.session.commit()
+
+    admin_email = os.getenv('ADMIN_EMAIL', 'admin@hilltop.com').strip().lower()
+    admin_password = os.getenv('ADMIN_PASSWORD') or 'ilovehilltop'
+
+    if not User.query.filter(db.func.lower(User.email) == admin_email).first():
+        admin_role = Role.query.filter_by(name='admin').first()
+        admin = User(
+            first_name='Admin',
+            last_name='User',
+            email=admin_email,
+            phone=os.getenv('ADMIN_PHONE', '1234567890'),
+            role_id=admin_role.id
+        )
+        admin.set_password(admin_password)
+        db.session.add(admin)
+        db.session.commit()
+        print(f'Created default admin user: {admin_email}')
+        print(f'Admin password: {admin_password}')
+
+
 def create_app(config_name=None):
     """Application factory"""
 
@@ -132,8 +168,9 @@ def create_app(config_name=None):
         db.session.rollback()
         return {'error': 'Internal server error'}, 500
 
-    # Create tables
+    # Create tables and ensure default admin user exists
     with app.app_context():
         db.create_all()
+        ensure_default_roles_and_admin()
 
     return app

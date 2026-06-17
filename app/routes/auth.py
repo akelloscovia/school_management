@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
+from sqlalchemy import func
 from app import db
 from app.models import User, Role
 from app.utils.decorators import validate_request_json, token_required
@@ -14,9 +15,10 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     """Register a new user"""
     data = request.get_json()
+    email = data['email'].strip().lower()
     
     # Check if user already exists
-    if User.query.filter_by(email=data['email']).first():
+    if User.query.filter(func.lower(User.email) == email).first():
         return ResponseFormatter.error('User with this email already exists', status_code=400)
     
     # Get role
@@ -28,7 +30,7 @@ def register():
     user = User(
         first_name=data['first_name'],
         last_name=data['last_name'],
-        email=data['email'],
+        email=email,
         phone=data.get('phone'),
         role_id=role.id
     )
@@ -53,10 +55,12 @@ def register():
 def login():
     """Login user"""
     data = request.get_json()
+    email = data['email'].strip().lower()
+    password = data['password']
     
-    user = User.query.filter_by(email=data['email']).first()
+    user = User.query.filter(func.lower(User.email) == email).first()
     
-    if not user or not user.check_password(data['password']):
+    if not user or not user.check_password(password):
         return ResponseFormatter.error('Invalid email or password', status_code=401)
     
     if not user.is_active:
