@@ -118,6 +118,50 @@ def admission_notification_webhook():
         return ResponseFormatter.error(f'Unable to create admission notification: {str(e)}', status_code=500)
 
 
+@communication_bp.route('/webhooks/contact-message', methods=['POST'])
+def contact_message_notification_webhook():
+    """Webhook endpoint for creating contact message notifications"""
+    data = request.get_json(silent=True) or {}
+    secret = request.headers.get('X-WEBHOOK-SECRET') or data.get('webhook_secret')
+    expected_secret = current_app.config.get('WEBHOOK_SECRET', '')
+
+    if not expected_secret:
+        return ResponseFormatter.error('Webhook is not configured on this server', status_code=500)
+    if not secret or secret != expected_secret:
+        return ResponseFormatter.error('Invalid webhook secret', status_code=401)
+
+    subject = data.get('subject')
+    body = data.get('body')
+    if not subject or not body:
+        return ResponseFormatter.error('Missing subject or body for contact message notification', status_code=400)
+
+    admin_users = User.query.join(Role).filter(Role.name == 'admin', User.is_active == True).all()
+    if not admin_users:
+        return ResponseFormatter.error('No active admin users found', status_code=404)
+
+    messages = []
+    try:
+        for admin in admin_users:
+            message = Message(
+                sender_id=admin.id,
+                recipient_id=admin.id,
+                subject=subject,
+                body=body
+            )
+            db.session.add(message)
+            messages.append(message)
+        db.session.commit()
+
+        return ResponseFormatter.success(
+            data={'created': len(messages)},
+            message='Contact message notification created',
+            status_code=201
+        )
+    except Exception as e:
+        db.session.rollback()
+        return ResponseFormatter.error(f'Unable to create contact message notification: {str(e)}', status_code=500)
+
+
 @communication_bp.route('/messages/<int:message_id>', methods=['GET'])
 @token_required
 def get_message(current_user, message_id):
