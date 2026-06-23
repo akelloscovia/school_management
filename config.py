@@ -23,6 +23,10 @@ class DevelopmentConfig(Config):
         'sqlite:///school_management.db'
     )
     WEBSITE_BACKEND_URL = os.getenv('WEBSITE_BACKEND_URL', 'http://localhost:5001')
+    CORS_ORIGINS = os.getenv(
+        'CORS_ORIGINS',
+        'http://localhost:5173,http://localhost:5174,http://localhost:3000,http://localhost:8000,https://school-mgt-frontend-89tm.onrender.com,https://portal.hilltopjunior.com'
+    ).split(',')
 
 
 class TestingConfig(Config):

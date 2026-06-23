@@ -133,6 +133,9 @@ def create_app(config_name=None):
     from app.routes.classes import classes_bp
     from app.routes.communication import communication_bp
     from app.routes.admissions import admissions_bp
+    from app.routes.finance import finance_bp
+    from app.routes.library import library_bp
+    from app.routes.transport import transport_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(users_bp, url_prefix='/api/users')
@@ -143,6 +146,9 @@ def create_app(config_name=None):
     app.register_blueprint(classes_bp, url_prefix='/api/classes')
     app.register_blueprint(communication_bp, url_prefix='/api/communication')
     app.register_blueprint(admissions_bp, url_prefix='/api/admissions')
+    app.register_blueprint(finance_bp, url_prefix='/api/finance')
+    app.register_blueprint(library_bp, url_prefix='/api/library')
+    app.register_blueprint(transport_bp, url_prefix='/api/transport')
 
     # ----------------------------
     # ERROR HANDLERS
