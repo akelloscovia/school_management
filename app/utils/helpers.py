@@ -83,3 +83,26 @@ def commit_to_db(obj=None):
         db.session.rollback()
         print(f"Database error: {str(e)}")
         return False
+
+
+def save_file(file, folder="hero"):
+    from werkzeug.utils import secure_filename
+    import os
+    from flask import current_app
+    if not file:
+        return None
+    filename = secure_filename(file.filename)
+    
+    upload_folder_base = current_app.config.get('UPLOAD_FOLDER_ABOUT', os.path.join(current_app.static_folder, 'uploads/about'))
+    
+    folder_map = {
+        "hero": os.path.join(upload_folder_base, 'hero'),
+        "operations": os.path.join(upload_folder_base, 'operations'),
+        "team": os.path.join(upload_folder_base, 'team'),
+        "pillars": os.path.join(upload_folder_base, 'pillars'),
+        "focus_areas": os.path.join(upload_folder_base, 'focus_areas')
+    }
+    path = os.path.join(folder_map.get(folder, upload_folder_base), filename)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    file.save(path)
+    return f"/uploads/about/{folder}/{filename}"

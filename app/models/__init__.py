@@ -9,6 +9,14 @@ from app.models.transport import BusRoute, BoardingAssignment, Dormitory, Dormit
 from app.models.attendance import Attendance, AttendanceStatus
 from app.models.marks import Marks, TermReport
 from app.models.communication import Message, Announcement
+from app.models.contact import ContactInfo, ContactMessage
+
+from app.models.website import (
+    AboutPage, Operation, FocusArea, CorePillar, TeamMember,
+    AdmissionApplication, WebsiteContactInfo, WebsiteContactMessage,
+    FooterInfo, Gallery, HomePage, ProductPreview, GalleryImage,
+    WebsiteAnnouncement, WebsiteStudent, Staff
+)
 
 __all__ = [
     'User',
@@ -35,5 +43,11 @@ __all__ = [
     'Marks',
     'TermReport',
     'Message',
-    'Announcement'
+    'Announcement',
+    'ContactInfo',
+    'ContactMessage',
+    'AboutPage', 'Operation', 'FocusArea', 'CorePillar', 'TeamMember',
+    'AdmissionApplication', 'WebsiteContactInfo', 'WebsiteContactMessage',
+    'FooterInfo', 'Gallery', 'HomePage', 'ProductPreview', 'GalleryImage',
+    'WebsiteAnnouncement', 'WebsiteStudent', 'Staff'
 ]

@@ -1,44 +1,29 @@
-from flask import Blueprint, request, jsonify, current_app
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask import Blueprint, request, current_app
 from app import db
-from app.models import Student, User, Role, Class
+from app.models import Student, User, Role
+from app.models.website import AdmissionApplication
 from app.utils.decorators import token_required, admin_required
 from app.utils.helpers import ResponseFormatter, generate_admission_number
 from datetime import datetime
-import requests
-import json
 
-admissions_bp = Blueprint('admissions', __name__, url_prefix='/api/admissions')
+admissions_bp = Blueprint('admissions', __name__)
 
 
 @admissions_bp.route('/pending', methods=['GET'])
 @token_required
 @admin_required
 def get_pending_admissions(current_user):
-    """Get all pending admissions from website backend"""
-    website_backend_url = current_app.config.get(
-        'WEBSITE_BACKEND_URL', 
-        'http://localhost:5001'
-    )
-    
+    """Get all pending admissions directly from database"""
     try:
-        # Get applications from website backend
-        response = requests.get(
-            f"{website_backend_url}/api/v1/admissions/applications",
-            headers={'Authorization': request.headers.get('Authorization', '')},
-            timeout=10
-        )
-        response.raise_for_status()
+        applications = AdmissionApplication.query.filter(
+            AdmissionApplication.status.in_(['Pending', 'Approved'])
+        ).order_by(AdmissionApplication.submitted_at.desc()).all()
         
-        data = response.json()
-        applications = data if isinstance(data, list) else data.get('applications', [])
-        
-        # Filter for pending and approved only
-        pending = [app for app in applications if app.get('status') in ['Pending', 'Approved']]
+        pending = [app.to_dict() for app in applications]
         
         return ResponseFormatter.success(data={'applications': pending})
     except Exception as e:
-        current_app.logger.error(f"Error fetching admissions from website: {e}")
+        current_app.logger.error(f"Error fetching admissions: {e}")
         return ResponseFormatter.error(f"Error fetching admissions: {str(e)}", status_code=500)
 
 
@@ -46,34 +31,27 @@ def get_pending_admissions(current_user):
 @token_required
 @admin_required
 def approve_admission(current_user, app_id):
-    """Approve an admission and create student in SMS, then sync back to website"""
+    """Approve an admission"""
     data = request.get_json() or {}
-    website_backend_url = current_app.config.get(
-        'WEBSITE_BACKEND_URL', 
-        'http://localhost:5001'
-    )
     
     try:
-        # First, notify website backend of approval
-        approval_data = {
-            'mgnt_student_id': data.get('student_id'),
-            'approved_by': current_user.id
-        }
-        
-        response = requests.put(
-            f"{website_backend_url}/api/v1/admissions/applications/{app_id}/approve",
-            json=approval_data,
-            headers={'Authorization': request.headers.get('Authorization', '')},
-            timeout=10
-        )
-        response.raise_for_status()
+        application = AdmissionApplication.query.get(app_id)
+        if not application:
+            return ResponseFormatter.error("Application not found", status_code=404)
+            
+        application.status = 'Approved'
+        if data.get('student_id'):
+            application.mgnt_student_id = data.get('student_id')
+            
+        db.session.commit()
         
         return ResponseFormatter.success(
-            data=response.json(),
+            data=application.to_dict(),
             message='Admission approved successfully',
             status_code=200
         )
     except Exception as e:
+        db.session.rollback()
         current_app.logger.error(f"Error approving admission: {e}")
         return ResponseFormatter.error(f"Error approving admission: {str(e)}", status_code=500)
 
@@ -84,30 +62,24 @@ def approve_admission(current_user, app_id):
 def reject_admission(current_user, app_id):
     """Reject an admission application"""
     data = request.get_json() or {}
-    website_backend_url = current_app.config.get(
-        'WEBSITE_BACKEND_URL', 
-        'http://localhost:5001'
-    )
     
     try:
-        rejection_data = {
-            'reason': data.get('reason', 'Application was not approved')
-        }
+        application = AdmissionApplication.query.get(app_id)
+        if not application:
+            return ResponseFormatter.error("Application not found", status_code=404)
+            
+        application.status = 'Rejected'
+        application.rejection_reason = data.get('reason', 'Application was not approved')
         
-        response = requests.put(
-            f"{website_backend_url}/api/v1/admissions/applications/{app_id}/reject",
-            json=rejection_data,
-            headers={'Authorization': request.headers.get('Authorization', '')},
-            timeout=10
-        )
-        response.raise_for_status()
+        db.session.commit()
         
         return ResponseFormatter.success(
-            data=response.json(),
+            data=application.to_dict(),
             message='Admission rejected successfully',
             status_code=200
         )
     except Exception as e:
+        db.session.rollback()
         current_app.logger.error(f"Error rejecting admission: {e}")
         return ResponseFormatter.error(f"Error rejecting admission: {str(e)}", status_code=500)
 
@@ -124,12 +96,11 @@ def enroll_student(current_user):
     if missing:
         return ResponseFormatter.error(f'Missing fields: {", ".join(missing)}', status_code=400)
     
-    website_backend_url = current_app.config.get(
-        'WEBSITE_BACKEND_URL', 
-        'http://localhost:5001'
-    )
-    
     try:
+        application = AdmissionApplication.query.get(data['app_id'])
+        if not application:
+            return ResponseFormatter.error("Admission application not found", status_code=404)
+            
         # Parse student name
         name_parts = data['student_name'].strip().split()
         first_name = name_parts[0] if name_parts else 'Student'
@@ -167,25 +138,13 @@ def enroll_student(current_user):
             admission_status='admitted'
         )
         db.session.add(student)
+        
+        # Sync back to admission application
+        application.status = 'Enrolled'
+        application.mgnt_student_id = student.id
+        application.mgnt_admission_number = student.admission_number
+        
         db.session.commit()
-        
-        # Sync back to website backend
-        sync_data = {
-            'student_id': student.id,
-            'student_name': data['student_name'],
-            'parent_email': data['parent_email'],
-            'admission_number': student.admission_number,
-            'student_email': student_email
-        }
-        
-        try:
-            requests.post(
-                f"{website_backend_url}/api/v1/admissions/webhook/sync-status",
-                json=sync_data,
-                timeout=10
-            )
-        except Exception as e:
-            current_app.logger.warning(f"Failed to sync admission status to website: {e}")
         
         return ResponseFormatter.success(
             data=student.to_dict(include_user=True),

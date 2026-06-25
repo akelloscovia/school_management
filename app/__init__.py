@@ -132,23 +132,44 @@ def create_app(config_name=None):
     from app.routes.reports import reports_bp
     from app.routes.classes import classes_bp
     from app.routes.communication import communication_bp
+    from app.routes.contact import contact_bp
     from app.routes.admissions import admissions_bp
     from app.routes.finance import finance_bp
     from app.routes.library import library_bp
     from app.routes.transport import transport_bp
+    
+    # Website CMS Blueprints
+    from app.routes.website.home_controller import website_home_bp
+    from app.routes.website.about_controller import website_about_bp
+    from app.routes.website.academics_controller import website_academics_bp
+    from app.routes.website.admissions_controller import website_admissions_bp
+    from app.routes.website.contact_info_controller import website_contact_info_bp
+    from app.routes.website.contact_message_controller import website_contact_message_bp
+    from app.routes.website.footer_controller import website_footer_bp
+    from app.routes.website.gallery_controller import website_gallery_bp
 
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(users_bp, url_prefix='/api/users')
-    app.register_blueprint(students_bp, url_prefix='/api/students')
-    app.register_blueprint(attendance_bp, url_prefix='/api/attendance')
-    app.register_blueprint(marks_bp, url_prefix='/api/marks')
-    app.register_blueprint(reports_bp, url_prefix='/api/reports')
-    app.register_blueprint(classes_bp, url_prefix='/api/classes')
-    app.register_blueprint(communication_bp, url_prefix='/api/communication')
-    app.register_blueprint(admissions_bp, url_prefix='/api/admissions')
-    app.register_blueprint(finance_bp, url_prefix='/api/finance')
-    app.register_blueprint(library_bp, url_prefix='/api/library')
-    app.register_blueprint(transport_bp, url_prefix='/api/transport')
+    app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
+    app.register_blueprint(users_bp, url_prefix='/api/v1/users')
+    app.register_blueprint(students_bp, url_prefix='/api/v1/students')
+    app.register_blueprint(attendance_bp, url_prefix='/api/v1/attendance')
+    app.register_blueprint(marks_bp, url_prefix='/api/v1/marks')
+    app.register_blueprint(reports_bp, url_prefix='/api/v1/reports')
+    app.register_blueprint(classes_bp, url_prefix='/api/v1/classes')
+    app.register_blueprint(communication_bp, url_prefix='/api/v1/communication')
+    app.register_blueprint(contact_bp, url_prefix='/api/v1')
+    app.register_blueprint(admissions_bp, url_prefix='/api/v1/admissions')
+    app.register_blueprint(finance_bp, url_prefix='/api/v1/finance')
+    app.register_blueprint(library_bp, url_prefix='/api/v1/library')
+    app.register_blueprint(transport_bp, url_prefix='/api/v1/transport')
+    
+    app.register_blueprint(website_home_bp)
+    app.register_blueprint(website_about_bp)
+    app.register_blueprint(website_academics_bp)
+    app.register_blueprint(website_admissions_bp)
+    app.register_blueprint(website_contact_info_bp)
+    app.register_blueprint(website_contact_message_bp)
+    app.register_blueprint(website_footer_bp)
+    app.register_blueprint(website_gallery_bp)
 
     # ----------------------------
     # ERROR HANDLERS
