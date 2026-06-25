@@ -4,7 +4,7 @@ from app.models.website import HomePage, WebsiteAnnouncement as Announcement
 from app.models.website import AboutPage
 from app.models.website import WebsiteContactInfo as Contact_Info
 
-website_home_bp = Blueprint('website_home', __name__, url_prefix='/home')
+website_home_bp = Blueprint('website_home', __name__)
 
 # Home page route
 @website_home_bp.route('/', methods=['GET'], strict_slashes=False)

@@ -4,9 +4,7 @@ import json
 import os
 
 # Blueprint without url_prefix
-website_academics_bp = Blueprint("academics", __name__, 
-url_prefix="/api/v1/academics"
-)
+website_academics_bp = Blueprint("academics", __name__)
 
 DEFAULT_ACADEMICS_CONTENT = {
     "title": "Academic Excellence",

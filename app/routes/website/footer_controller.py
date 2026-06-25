@@ -11,7 +11,7 @@ from app.status_codes import (
     HTTP_200_OK, HTTP_404_NOT_FOUND
 )
 
-website_footer_bp = Blueprint("footer", __name__, url_prefix="/api/v1/footer")
+website_footer_bp = Blueprint("footer", __name__)
 # CREATE: Add new footer contact info
 @website_footer_bp.route("/", methods=["POST"], strict_slashes=False)
 def create_contact():

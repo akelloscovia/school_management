@@ -6,14 +6,13 @@ from app.status_codes import (
     HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_201_CREATED,
     HTTP_200_OK,
-    HTTP_404_NOT_FOUND,
-)
+    HTTP_404_NOT_FOUND)
 from app import db
 from app.models.website import WebsiteContactMessage as Contact_Message
 import validators
 import  requests
 
-website_contact_message_bp = Blueprint("contact_message", __name__, url_prefix="/api/v1/contact_message")
+website_contact_message_bp = Blueprint("contact_message", __name__)
 
 
 # --- Helper function for Brevo ---
@@ -101,8 +100,7 @@ def submit_contact():
             last_name=last_name,
             email=email if email else None,
             phone=phone if phone else None,
-            message=message,
-        )
+            message=message)
         db.session.add(contact_msg)
         db.session.commit()
 

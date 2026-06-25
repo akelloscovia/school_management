@@ -11,10 +11,9 @@ from app.status_codes import (
     HTTP_200_OK, HTTP_404_NOT_FOUND
 )
 
-website_contact_info_bp = Blueprint("contact_info", __name__, url_prefix="/api/v1/contact_info")
+website_contact_info_bp = Blueprint("contact_info", __name__)
 # CREATE: Add new contact info
-@website_contact_info_bp.route("/", methods=["POST"], 
- )
+@website_contact_info_bp.route("/", methods=["POST"])
 def create_contact():
     data = request.get_json() or {}
 

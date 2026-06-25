@@ -4,7 +4,7 @@ import os
 from app import db
 from app.models.website import Gallery
 
-website_gallery_bp = Blueprint('website_gallery', __name__, url_prefix='/gallery')
+website_gallery_bp = Blueprint('website_gallery', __name__)
 
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'mkv'}

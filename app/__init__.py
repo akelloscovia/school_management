@@ -162,14 +162,14 @@ def create_app(config_name=None):
     app.register_blueprint(library_bp, url_prefix='/api/v1/library')
     app.register_blueprint(transport_bp, url_prefix='/api/v1/transport')
     
-    app.register_blueprint(website_home_bp)
-    app.register_blueprint(website_about_bp)
-    app.register_blueprint(website_academics_bp)
-    app.register_blueprint(website_admissions_bp)
-    app.register_blueprint(website_contact_info_bp)
-    app.register_blueprint(website_contact_message_bp)
-    app.register_blueprint(website_footer_bp)
-    app.register_blueprint(website_gallery_bp)
+    app.register_blueprint(website_home_bp, url_prefix='/api/v1/home')
+    app.register_blueprint(website_about_bp, url_prefix='/api/v1/about')
+    app.register_blueprint(website_academics_bp, url_prefix='/api/v1/academics')
+    app.register_blueprint(website_admissions_bp, url_prefix='/api/v1/admissions')
+    app.register_blueprint(website_contact_info_bp, url_prefix='/api/v1/contact_info')
+    app.register_blueprint(website_contact_message_bp, url_prefix='/api/v1/contact_message')
+    app.register_blueprint(website_footer_bp, url_prefix='/api/v1/footer')
+    app.register_blueprint(website_gallery_bp, url_prefix='/api/v1/gallery')
 
     # ----------------------------
     # ERROR HANDLERS
