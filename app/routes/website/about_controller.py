@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, send_from_directory
 from werkzeug.utils import secure_filename
 from app.models.website import TeamMember
 import json
@@ -46,6 +46,12 @@ def save_about_content(content):
     content.setdefault('deputy_head_teacher_image', '')
     with open(content_file, 'w', encoding='utf-8') as f:
         json.dump(content, f, ensure_ascii=False, indent=2)
+
+
+@website_about_bp.route('/uploads/<path:filename>', methods=['GET'], strict_slashes=False)
+def serve_about_upload(filename):
+    upload_folder_base = current_app.config.get('UPLOAD_FOLDER_ABOUT', os.path.join(current_app.static_folder, 'uploads', 'about'))
+    return send_from_directory(upload_folder_base, filename)
 
 
 # School overview

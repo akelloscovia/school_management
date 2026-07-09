@@ -93,7 +93,7 @@ def save_file(file, folder="hero"):
         return None
     filename = secure_filename(file.filename)
     
-    upload_folder_base = current_app.config.get('UPLOAD_FOLDER_ABOUT', os.path.join(current_app.static_folder, 'uploads/about'))
+    upload_folder_base = current_app.config.get('UPLOAD_FOLDER_ABOUT', os.path.join(current_app.static_folder, 'uploads', 'about'))
     
     folder_map = {
         "hero": os.path.join(upload_folder_base, 'hero'),
@@ -105,4 +105,4 @@ def save_file(file, folder="hero"):
     path = os.path.join(folder_map.get(folder, upload_folder_base), filename)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     file.save(path)
-    return f"/uploads/about/{folder}/{filename}"
+    return f"/api/v1/about/uploads/{folder}/{filename}"

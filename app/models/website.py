@@ -231,7 +231,7 @@ class Gallery(db.Model):
             'id': self.id,
             'filename': self.filename,
             'media_type': self.media_type,
-            'image': f'uploads/products/{self.filename}'
+            'image': f'/api/v1/gallery/files/{self.filename}'
         }
 
 
